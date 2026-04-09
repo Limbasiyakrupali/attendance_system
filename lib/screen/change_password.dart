@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:attendance_system/core/constant/app_color.dart';
 import 'package:flutter/material.dart';
 import '../core/constant/app_string.dart';
@@ -23,7 +21,6 @@ class _ChangePasswordState extends State<ChangePassword> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController currentPasswordController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
-
   bool showPassword = true;
   bool showConfirmPassword = true;
   bool checkBoxValue = false;
@@ -78,10 +75,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         /// TITLE
-                        Text(
-                            AppString.informationTitle,
-                            style: AppTypography.getTextTheme(context).titleSmall?.copyWith(color: AppColors.primary,fontWeight: FontWeight.w700,fontSize: 16)
-                        ),
+                        Text(AppString.informationTitle, style: AppTypography.getTextTheme(context).titleSmall?.copyWith(color: AppColors.primary,fontWeight: FontWeight.w700,fontSize: 16)),
                         SizedBox(height: isLandscape ? 22 : 34),
                         /// EMAIL
                         CommonTextField(
@@ -118,7 +112,6 @@ class _ChangePasswordState extends State<ChangePassword> {
                           },
                         ),
                         const SizedBox(height: 14),
-                        /// OPTIONS ROW (RESPONSIVE)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -138,7 +131,6 @@ class _ChangePasswordState extends State<ChangePassword> {
                             ),
                           ],
                         ),
-                        /// OPTIONS ROW (RESPONSIVE)
                         SizedBox(height: context.responsiveValue(mobile: 26, tablet: 36)),
                         /// UPDATE PASSWORD BUTTON
                         CustomButton(

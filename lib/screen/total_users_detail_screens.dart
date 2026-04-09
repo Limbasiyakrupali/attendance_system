@@ -26,8 +26,7 @@ class _TotalUsersDetailScreensState extends State<TotalUsersDetailScreens> {
     super.initState();
     Future.microtask(()async{
       context.read<DashboardProvider>().getTotalUserDetail();
-      final provider = Provider.of<DashboardProvider>(context, listen: false);
-      provider.initializeData();
+       Provider.of<DashboardProvider>(context, listen: false).initializeData();
     });
   }
 

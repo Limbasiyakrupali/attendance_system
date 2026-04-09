@@ -20,7 +20,7 @@ class DashboardProvider extends ChangeNotifier{
       // log(response.toString(),name: "==========userDetailList response===============");
       userDetailList = List<Map<String,dynamic>>.from(response);
 
-      log(userDetailList.toString(),name: "==========userDetailList===============");
+      // log(userDetailList.toString(),name: "==========userDetailList===============");
     }catch(e){
       print("User Detail Error: $e");
     }

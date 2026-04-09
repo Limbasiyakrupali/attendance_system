@@ -1,4 +1,3 @@
-
 class Attendance {
   final DateTime date;
   final String checkIn1;

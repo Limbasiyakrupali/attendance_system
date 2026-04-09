@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:attendance_system/core/constant/app_color.dart';
 import 'package:attendance_system/core/constant/app_string.dart';
 import 'package:attendance_system/core/widget/common_widget.dart';
@@ -12,7 +11,6 @@ import 'package:provider/provider.dart';
 import '../core/constant/app_typography.dart';
 import '../core/widget/custom_button.dart';
 import 'package:feather_icons/feather_icons.dart';
-
 import '../provider/attendance_provider.dart';
 import '../provider/dashboard_provider.dart';
 
@@ -29,7 +27,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String selectedRole = "All Roles";
   String selectedEmployee = "All Employees";
   String selectedMonth = "All Months";
-
   List<Map<String, dynamic>> getFilteredData(List<Map<String, dynamic>> data) {
     return data.where((item) {
       /// ROLE FILTER
@@ -68,17 +65,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Set<String> traineeSet = {};
     Set<String> hrSet = {};
     Set<String> freelancerSet = {};
-    Set<String> partnerSet = {}; // ✅ New role
+    Set<String> partnerSet = {};
     Set<String> totalUsersSet = {};
 
     for (var e in data) {
       String role = (e['role'] ?? "").toString().toLowerCase().trim();
       String name = (e['employee'] ?? "").toString();
 
-      // ❌ Skip admin
+      /// Skip admin
       if (role == "admin") continue;
 
-      // ✅ Total users (without admin)
+      /// Total users (without admin)
       totalUsersSet.add(name);
 
       if (role == "employee") {
@@ -89,30 +86,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
         hrSet.add(name);
       } else if (role == "freelance") {
         freelancerSet.add(name);
-      } else if (role == "partner") { // ✅ Count partners
+      } else if (role == "partner") {
         partnerSet.add(name);
       }
     }
-
     return {
       "total": totalUsersSet.length,
       "employee": employeeSet.length,
       "trainee": traineeSet.length,
       "hr": hrSet.length,
       "freelancer": freelancerSet.length,
-      "partner": partnerSet.length, // ✅ Include in result
+      "partner": partnerSet.length,
     };
   }
 
   @override
   void initState() {
     super.initState();
-    /// Live clock update every second
     Future.microtask((){
       context.read<DashboardProvider>().getTotalUserDetail();
       context.read<AttendanceProvider>().getAttendance();
-      Provider.of<AttendanceProvider>(context, listen: false)
-          .mergeData(context);
+      Provider.of<AttendanceProvider>(context, listen: false).mergeData(context);
     });
     timer = Timer.periodic(const Duration(seconds: 1), (_) {
       setState(() {
@@ -120,6 +114,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       });
     });
   }
+
 
   @override
   void dispose() {
@@ -170,7 +165,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     try {
       final utcTime = DateTime.parse(time);
-      final localTime = utcTime.toLocal(); // 🔥 IMPORTANT
+      final localTime = utcTime.toLocal();
       return DateFormat("hh:mm a").format(localTime);
     } catch (e) {
       return "--";
@@ -187,17 +182,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: color),
       ),
-
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-
-          /// 🔵 Blinking Dot
+          /// Blinking Dot
           if (status == "Working") ...[
             BlinkingDot(color: color, size: 8),
             SizedBox(width: 6),
           ],
-
           Text(
             status,
             style: AppTypography.getTextTheme(context).bodyLarge?.copyWith(color: color,fontSize: 14)
@@ -211,9 +203,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _employeeView(
       BuildContext context, AttendanceProvider attendanceProvider, bool isTablet) {
 
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
-
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     Widget content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -245,9 +235,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
 
-        /// ✅ DROPDOWN KO NICHE LE AO
+        /// DROPDOWN
         SizedBox(height: 25),
-
         Row(
           children: [
             Expanded(
@@ -272,8 +261,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   await attendanceProvider.fetchAttendance();
                   attendanceProvider.calculateStats();
                 },
-
-
               ),
             ),
             SizedBox(width: 10),
@@ -312,7 +299,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           crossAxisSpacing: 10,
           children: [
 
-            /// ✅ Present Days
+            /// Present Days
             _buildCard(
               context: context,
               title: "Present Days",
@@ -321,7 +308,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               isTablet: isTablet,
             ),
 
-            /// ❌ Absent Days
+            /// Absent Days
             _buildCard(
               context: context,
               title: "Absent Days",
@@ -330,7 +317,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               isTablet: isTablet,
             ),
 
-            /// ⏱ Total Hours
+            /// Total Hours
             _buildCard(
               context: context,
               title: "Total Hours",
@@ -339,7 +326,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               isTablet: isTablet,
             ),
 
-            /// 📊 Avg Hours
+            /// Avg Hours
             _buildCard(
               context: context,
               title: "Avg Hours",
@@ -350,16 +337,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
         SizedBox(height: 15),
-
-        Text(
-          "Today's Status",
-          style: AppTypography.getTextTheme(context)
-              .titleSmall
-              ?.copyWith(fontSize: isTablet ? 18 : 16),
-        ),
-
+        /// Today's Status
+        Text("Today's Status", style: AppTypography.getTextTheme(context).titleSmall?.copyWith(fontSize: isTablet ? 18 : 16),),
         SizedBox(height: 12),
-
         Consumer<WorkProvider>(
           builder: (context, provider, _) {
             return CommonWidget.commonStatusButton(
@@ -378,8 +358,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ],
     );
-
-    /// ✅ FINAL RETURN (WITHOUT CONTAINER)
     return isLandscape
         ? SizedBox(
       height: MediaQuery.of(context).size.height * 0.8,
@@ -394,13 +372,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
   String _formatDuration(Duration d) {
-    int totalMinutes = (d.inSeconds / 60).round(); // 🔥 ROUND
+    int totalMinutes = (d.inSeconds / 60).round();
 
     int h = totalMinutes ~/ 60;
     int m = totalMinutes % 60;
 
     return "${h}h ${m}m";
   }
+
   String _getMonthName(int month) {
     const months = [
       "January","February","March","April","May","June",
@@ -408,6 +387,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ];
     return months[month - 1];
   }
+
 /// ================= ADMIN VIEW =================
 
   Widget _adminView(BuildContext context, bool isTablet) {
@@ -463,9 +443,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
-
-          // SizedBox(height: 5),
-
           /// GRID CARDS (WITH PROGRESS)
           GridView.count(
             crossAxisCount: isTablet ? 2 : 2,
@@ -475,7 +452,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             // crossAxisSpacing: 5,
             // mainAxisSpacing: 5,
             children: [
-
               GestureDetector(
                 onTap: (){
                   Navigator.pushNamed(context, 'total_users');
@@ -488,7 +464,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   isTablet,
                 ),
               ),
-
               _buildAdminCard(
                 context,
                 "Employee",
@@ -496,7 +471,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 total == 0 ? 0 : employee / total,
                 isTablet,
               ),
-
               _buildAdminCard(
                 context,
                 "Freelancer",
@@ -504,7 +478,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 total == 0 ? 0 : freelancer / total,
                 isTablet,
               ),
-
               _buildAdminCard(
                 context,
                 "Trainee",
@@ -512,7 +485,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 total == 0 ? 0 : trainee / total,
                 isTablet,
               ),
-
               _buildAdminCard(
                 context,
                 "Partners",
@@ -520,7 +492,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 total == 0 ? 0 : partner / total,
                 isTablet,
               ),
-
               _buildAdminCard(
                 context,
                 "HR",
@@ -536,7 +507,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
-
           SizedBox(height: 8),
           IntrinsicHeight(
             child: Padding(
@@ -581,10 +551,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 itemCount: attendanceProvider.finalList.length,
                 itemBuilder: (context, index) {
                   final user = attendanceProvider.finalList[index];
-
                   final status = attendanceProvider.getCurrentStatus(user);
                   final color = attendanceProvider.getStatusColor(status);
-
                   return Container(
                     margin: EdgeInsets.symmetric(horizontal: 4, vertical: 6),
                     padding: EdgeInsets.all(14),
@@ -596,8 +564,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-
-                        /// LEFT
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -612,8 +578,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                           ],
                         ),
-
-                        /// RIGHT
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
@@ -630,7 +594,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   );
                 },
               ),
-
           SizedBox(height: 20),
         ],
       ),
@@ -711,7 +674,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       BuildContext context,
       String title,
       String value,
-      double progress,   // ✅ NEW
+      double progress,
       bool isTablet,
       ) {
 
@@ -764,12 +727,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         border: Border.all(color: borderColor, width: 1.5),
         borderRadius: BorderRadius.circular(12),
       ),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-
           /// TITLE
           Text(
             title,
@@ -779,9 +740,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               color: textColor,
             ),
           ),
-
           SizedBox(height: 8),
-
           /// VALUE
           Text(
             value,
@@ -791,14 +750,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               color: textColor,
             ),
           ),
-
           SizedBox(height: 10),
-
-          /// ✅ PROGRESS BAR
+          /// PROGRESS BAR
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
-              value: progress.clamp(0.0, 1.0), // safe
+              value: progress.clamp(0.0, 1.0),
               minHeight: isTablet ? 8 : 6,
               backgroundColor: Colors.white,
               valueColor: AlwaysStoppedAnimation(borderColor),
@@ -811,7 +768,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildAddUserCard(
       BuildContext context,
       String value,
-      double progress,   // ✅ NEW
+      double progress,
       bool isTablet,
       ) {
     return GestureDetector(
@@ -873,8 +830,5 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     );
-  }
-  String formatDuration(Duration d) {
-    return "${d.inHours}h ${d.inMinutes.remainder(60)}m";
   }
 }

@@ -578,28 +578,6 @@ AttendanceBtnStatus btnStatus = AttendanceBtnStatus.notCheckedIn;
 
   }
 
-  // Future<void> updateStatus() async {
-  //
-  //   if (firstCheckIn == null) {
-  //     status = AttendanceStatus.firstCheckIn;
-  //
-  //   } else if (firstCheckOut == null) {
-  //     status = AttendanceStatus.firstCheckOut;
-  //     btnStatus = AttendanceBtnStatus.firstCheckIn;
-  //
-  //   } else if (secondCheckIn == null) {
-  //     status = AttendanceStatus.secondCheckIn;
-  //     btnStatus = AttendanceBtnStatus.firstCheckOut;
-  //
-  //   } else if (secondCheckOut == null) {
-  //     status = AttendanceStatus.secondCheckOut;
-  //     btnStatus = AttendanceBtnStatus.secondCheckIn;
-  //
-  //   } else {
-  //     status = AttendanceStatus.completed;
-  //     btnStatus = AttendanceBtnStatus.secondCheckOut;
-  //   }
-  // }
   Future<void> updateStatus() async {
 
     /// NEW CONDITION

@@ -3,6 +3,8 @@ import 'package:attendance_system/core/constant/app_typography.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 
 import '../core/constant/app_string.dart';
@@ -10,6 +12,10 @@ import '../core/widget/common_widget.dart';
 import '../core/widget/custom_button.dart';
 import '../provider/attendance_provider.dart';
 import '../provider/user_provider.dart';
+import 'package:excel/excel.dart' hide Border;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class ShowUserListScreen extends StatefulWidget {
   const ShowUserListScreen({super.key});
@@ -22,8 +28,15 @@ class _ShowUserListScreenState extends State<ShowUserListScreen> {
   String selectedRole = "All Roles";
   String selectedEmployee = "All Employees";
   String selectedMonth = "All Months";
-
   TextEditingController searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      context.read<AttendanceProvider>().getAttendance();
+    });
+  }
 
   List<Map<String, dynamic>> getFilteredData(List<Map<String, dynamic>> data) {
     return data.where((item) {
@@ -61,15 +74,6 @@ class _ShowUserListScreenState extends State<ShowUserListScreen> {
     }).toList();
   }
 
-
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      context.read<AttendanceProvider>().getAttendance();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
@@ -77,8 +81,7 @@ class _ShowUserListScreenState extends State<ShowUserListScreen> {
 
     final filtered = getFilteredData(provider.attendanceListt);
 
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
     return Container(
       color: AppColors.primary,
@@ -86,6 +89,21 @@ class _ShowUserListScreenState extends State<ShowUserListScreen> {
         bottom: false,
         child: Scaffold(
           backgroundColor: AppColors.white,
+          floatingActionButton: Row(
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  exportToExcel(filtered, context);
+                },
+                child: Text("Export Excel"),
+              ),
+              SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () => exportToPDF(filtered),
+                child: Text("Export PDF"),
+              ),
+            ],
+          ),
           body: provider.isLoading
               ? const Center(
             child: CircularProgressIndicator(color: AppColors.primary),
@@ -97,18 +115,176 @@ class _ShowUserListScreenState extends State<ShowUserListScreen> {
       ),
     );
   }
+  Future<String> getDownloadPath() async {
+    Directory? dir = await getExternalStorageDirectory();
+
+    String newPath = "";
+    List<String> folders = dir!.path.split("/");
+
+    for (int i = 1; i < folders.length; i++) {
+      String folder = folders[i];
+      if (folder != "Android") {
+        newPath += "/$folder";
+      } else {
+        break;
+      }
+    }
+
+    newPath = "$newPath/Download";
+
+    return newPath;
+  }
+  Future<void> saveExcelToDownloads(List<int> bytes) async {
+    final path = await getDownloadPath();
+
+    final file = File("$path/attendance.xlsx");
+
+    await file.writeAsBytes(bytes);
+
+    print("Saved at: $path");
+  }
+  Future<void> exportToExcel(List data, BuildContext context) async {
+    var excel = Excel.createExcel();
+    Sheet sheet = excel['Sheet1'];
+
+    /// Header
+    sheet.appendRow([
+      TextCellValue('Date'),
+      TextCellValue('Employee'),
+      TextCellValue('Role'),
+      TextCellValue('CheckIn1'),
+      TextCellValue('CheckOut1'),
+      TextCellValue('CheckIn2'),
+      TextCellValue('CheckOut2'),
+      TextCellValue('Working Hours'),
+    ]);
+
+    /// Data
+    for (var e in data) {
+      sheet.appendRow([
+        TextCellValue(formatDate(e['date'])),
+        TextCellValue(e['employee'] ?? ""),
+        TextCellValue(e['role'] ?? ""),
+        TextCellValue(formatToIST(e['checkIn1'])),
+        TextCellValue(formatToIST(e['checkOut1'])),
+        TextCellValue(formatToIST(e['checkIn2'])),
+        TextCellValue(formatToIST(e['checkOut2'])),
+        TextCellValue(
+          totalWorkingHours(
+            parseTime(e['checkIn1']),
+            parseTime(e['checkOut1']),
+            parseTime(e['checkIn2']),
+            parseTime(e['checkOut2']),
+          ),
+        ),
+      ]);
+    }
+
+    final bytes = excel.encode()!;
+    await saveExcelToDownloads(bytes);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("File saved in Downloads ✅")),
+    );
+  }
+
+  /// Download pdf
+
+  Future<void> savePDFToDownloads(List<int> bytes) async {
+    final path = await getDownloadPath();
+    final file = File("$path/attendance.pdf");
+
+    await file.writeAsBytes(bytes);
+  }
+
+  Future<void> exportToPDF(List data) async {
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.MultiPage(
+        build: (context) => [
+          pw.Text(
+            "Attendance Report",
+            style: pw.TextStyle(fontSize: 18),
+          ),
+
+          pw.SizedBox(height: 10),
+
+          pw.Table.fromTextArray(
+            headers: [
+              'Date','Employee','Role','CheckIn 1','CheckOut 1','CheckIn 2','CheckOut 2','Hours'
+            ],
+            data: data.map((e) => [
+              formatDate(e['date']),
+              e['employee'] ?? "",
+              e['role'] ?? "",
+              formatToIST(e['checkIn1']),
+              formatToIST(e['checkOut1']),
+              formatToIST(e['checkIn2']),
+              formatToIST(e['checkOut2']),
+              totalWorkingHours(
+                parseTime(e['checkIn1']),
+                parseTime(e['checkOut1']),
+                parseTime(e['checkIn2']),
+                parseTime(e['checkOut2']),
+              ),
+            ]).toList(),
+          ),
+        ],
+      ),
+    );
+
+    /// ✅ THIS OPENS PREVIEW
+    await Printing.layoutPdf(
+      onLayout: (format) async => pdf.save(),
+    );
+  }
+
   Widget _buildPortraitLayout(userProvider, provider, filtered) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        /// ✅ FIXED APP BAR
+        ///  FIXED APP BAR
         CommonWidget.commonAppBarWidget(
           context: context,
           title:
           "${AppString.loginUserText} ${userProvider.name} (${userProvider.role})",
         ),
-
-        /// ✅ SCROLLABLE PART ONLY
+        Container(
+          margin: EdgeInsets.only(top: 10,left: 10,right: 8),
+          height: 180,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            border: Border.all(color: Colors.grey.shade300),
+            boxShadow: [
+              BoxShadow(
+                offset: Offset(0, 2),
+                spreadRadius: 2,
+                blurRadius: 2,
+                color: Colors.grey.shade300
+              )
+            ]
+          ),
+          child: Column(
+            children: [
+             Row(
+               children: [
+                 Container(
+                   height: 50,
+                   width: 50,
+                   decoration: BoxDecoration(
+                     color: AppColors.primary.withOpacity(0.1),
+                     borderRadius: BorderRadius.circular(8),
+                   ),
+                   child: Icon(FeatherIcons.edit,color: AppColors.primary,size: 22,),
+                 )
+               ],
+             )
+          ],
+          ),
+        ),
+        /// SCROLLABLE PART ONLY
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -207,8 +383,8 @@ class _ShowUserListScreenState extends State<ShowUserListScreen> {
   }
   Widget buildAttendanceList(List data) {
     return ListView.builder(
-      shrinkWrap: true, // ✅ MUST
-      physics: NeverScrollableScrollPhysics(), // ✅ MUST
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
       itemCount: data.length,
       itemBuilder: (context, index) {
         final e = data[index];
@@ -223,7 +399,7 @@ class _ShowUserListScreenState extends State<ShowUserListScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// 🔹 TOP ROW
+              /// TOP ROW
               Padding(
                 padding: const EdgeInsets.only(top: 3),
                 child: Row(
@@ -252,10 +428,10 @@ class _ShowUserListScreenState extends State<ShowUserListScreen> {
                         ),
                       ],
                     ),
-                    /// 🔹 WORKING HOURS
+                    /// WORKING HOURS
                     Align(
                       alignment: Alignment.centerRight,
-                      child:    Container(
+                      child:  Container(
                         height: 40,
                         width: 105,
                         decoration: BoxDecoration(
@@ -286,7 +462,7 @@ class _ShowUserListScreenState extends State<ShowUserListScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              /// 🔹 EMPLOYEE
+              /// EMPLOYEE
              Row(
                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                children: [
@@ -302,7 +478,7 @@ class _ShowUserListScreenState extends State<ShowUserListScreen> {
              ),
               const Divider(),
               SizedBox(height: 5),
-              /// 🔹 TIME ROWS
+              /// TIME ROWS
               attendanceHistoryCheckInCardContent(
                 context: context,
                 checkInTime1: formatToIST(e['checkIn1']),
@@ -501,92 +677,4 @@ class _ShowUserListScreenState extends State<ShowUserListScreen> {
       ),
     );
   }
-  /// for table view
-  // Widget buildTable(List data) {
-  //   return Container(
-  //     padding: const EdgeInsets.all(16),
-  //     decoration: BoxDecoration(
-  //       border: Border.all(color: Colors.grey.shade300),
-  //       borderRadius: BorderRadius.circular(12),
-  //     ),
-  //
-  //     /// 🔥 HORIZONTAL SCROLL
-  //     child: SingleChildScrollView(
-  //       scrollDirection: Axis.horizontal,
-  //
-  //       child: Column(
-  //         children: [
-  //
-  //           /// HEADER
-  //           Row(
-  //             children: const [
-  //               TableCellWidget(title: "Date"),
-  //               TableCellWidget(title: "Employee"),
-  //               TableCellWidget(title: "Role"),
-  //               TableCellWidget(title: "Check-in 1"),
-  //               TableCellWidget(title: "Check-out 1"),
-  //               TableCellWidget(title: "Check-in 2"),
-  //               TableCellWidget(title: "Check-out 2"),
-  //               TableCellWidget(title: "Working Hours"),
-  //             ],
-  //           ),
-  //
-  //           const Divider(),
-  //
-  //           /// DATA
-  //           ...data.map((e) {
-  //             return Column(
-  //               children: [
-  //                 Row(
-  //                   children: [
-  //                     TableCellWidget(title: DateFormat('dd/MM/yyyy').format(DateTime.parse(e['date']))),
-  //                     TableCellWidget(title: e['employee'] ?? ""),
-  //                     TableCellWidget(title: e['role'] ?? ""),
-  //                     TableCellWidget(title: formatToIST(e['checkIn1'] ?? '--:--')),
-  //                     TableCellWidget(title: formatToIST(e['checkOut1']?? '--:--')),
-  //                     TableCellWidget(title: formatToIST(e['checkIn2'])?? '--:--'),
-  //                     TableCellWidget(title: formatToIST(e['checkOut2']?? '--:--')),
-  //                     TableCellWidget(
-  //                       title: totalWorkingHours(
-  //                         parseTime(e['checkIn1']),
-  //                         parseTime(e['checkOut1']),
-  //                         parseTime(e['checkIn2']),
-  //                         parseTime(e['checkOut2']),
-  //                       ),
-  //                     ),
-  //                   ],
-  //                 ),
-  //                 const Divider(),
-  //               ],
-  //             );
-  //           }).toList(),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 }
-
-
-///for table view
-// class TableCellWidget extends StatelessWidget {
-//   final String title;
-//
-//   const TableCellWidget({super.key, required this.title});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       width: 130, /// 🔥 FIX WIDTH (important for alignment)
-//       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-//       alignment: Alignment.centerLeft,
-//
-//       child: Text(
-//         title,
-//         style: const TextStyle(fontSize: 13),
-//         overflow: TextOverflow.ellipsis,
-//       ),
-//     );
-//   }
-//
-// }

@@ -1,7 +1,6 @@
 import 'package:attendance_system/core/constant/app_color.dart';
 import 'package:attendance_system/core/constant/app_typography.dart';
 import 'package:attendance_system/provider/attendance_provider.dart';
-import 'package:attendance_system/screen/add_user_screen.dart';
 import 'package:attendance_system/screen/dashboard_screen.dart';
 import 'package:attendance_system/screen/history_screen.dart';
 import 'package:attendance_system/screen/show_user_list_screen.dart';
@@ -10,7 +9,7 @@ import 'package:attendance_system/services/api_service/token_service.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import '../provider/dashboard_provider.dart';
 import '../provider/work_provider.dart';
 import 'profile_screen.dart';
 
@@ -25,79 +24,25 @@ class _HomeScreenState extends State<HomeScreen> {
   PageController pageController = PageController();
   int currentIndex = 0;
   String role = "";
-  List<Widget> pages = [];
-  List<BottomNavigationBarItem> navItems = [];
 
   @override
   void initState() {
-    print("=============================");
     // TODO: implement initState
     super.initState();
     loadRole();
     Future.microtask(() {
-      Provider.of<WorkProvider>(context, listen: false)
-          .loadTodayAttendance();
-    context.read<AttendanceProvider>().fetchAttendance();
-
-      // Provider.of<AttendanceProvider>(context,listen: false).filterAttendance();
+      Provider.of<WorkProvider>(context, listen: false).loadTodayAttendance();
+      context.read<AttendanceProvider>().fetchAttendance();
     });
   }
 
   Future<void> loadRole()async{
    role =  await TokenService.getRole() ?? '';
-   setUpNavigation();
    setState(() {});
   }
 
-  void setUpNavigation(){
-
-    pages = [
-      DashboardScreen(),
-      StatusScreen(),
-      ProfileScreen(),
-      HistoryScreen(),
-    ];
-
-    navItems = [
-      BottomNavigationBarItem(
-          label: "Home",
-          icon: buildIcon(FeatherIcons.home,0)
-      ),
-      BottomNavigationBarItem(
-          label: "Status",
-          icon: buildIcon(FeatherIcons.barChart,1)
-      ),
-      BottomNavigationBarItem(
-          label: "Profile",
-          icon: buildIcon(FeatherIcons.user,2)
-      ),
-      BottomNavigationBarItem(
-          label: "History",
-          icon: buildIcon(Icons.history,3)
-      ),
-    ];
-
-    /// ADMIN ke liye extra tab
-    if(role == 'ADMIN' || role == 'HR'){
-
-      // pages.add(AddUserScreen());
-      pages.add(ShowUserListScreen());
-
-      navItems.add(
-        BottomNavigationBarItem(
-          label: "User",
-          icon: buildIcon(FeatherIcons.userPlus,4),
-        ),
-      );
-    }
-  }
   @override
   Widget build(BuildContext context) {
-    if(navItems.isEmpty){
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
     return Scaffold(
       backgroundColor: AppColors.white,
       bottomNavigationBar: Theme(
@@ -153,12 +98,21 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: PageView(
         controller: pageController,
-        onPageChanged: (int index){
+        onPageChanged: (index) {
           setState(() {
             currentIndex = index;
           });
         },
-        children: pages,
+        children: [
+          DashboardScreen(),
+          StatusScreen(),
+          ProfileScreen(),
+          HistoryScreen(),
+
+          ///  ADD HERE (last page)
+          if (role == "ADMIN" || role == 'HR')
+            ShowUserListScreen(),
+        ],
       ),
     );
   }

@@ -56,7 +56,7 @@ class UserProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
 
-      // debugPrint("Create User Error: $e");
+      debugPrint("Create User Error: $e");
       return false;
     }
   }
@@ -83,23 +83,6 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Future<bool> updateUser(String userId, Map<String, dynamic> body) async {
-  //   try {
-  //     final res = await ApiHelper.apiHelper.put(
-  //       "https://uptech-login.vercel.app/api/v1/users/$userId",
-  //       body,
-  //     );
-  //     if (res["message"] == "User updated successfully") {
-  //       return true;
-  //     }
-  //     return false;
-  //   } catch (e) {
-  //     print("Update Error: $e");
-  //     return false;
-  //   }
-  // }
-
-  // Update local user data (after API success)
   void updateLocalUser(Map<String, dynamic> updatedUser) {
     currentUser = updatedUser;
     notifyListeners();

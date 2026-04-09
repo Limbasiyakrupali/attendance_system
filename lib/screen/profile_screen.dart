@@ -48,10 +48,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         children: [
                           /// APP BAR
-                          CommonWidget.commonAppBarWidget(
-                            context: context,
-                            title:
-                            "${AppString.loginUserText} ${provider.name} (${provider.role})",
+                          CommonWidget.commonAppBarWidget(context: context, title: "${AppString.loginUserText} ${provider.name} (${provider.role})",
                           ),
                           /// PROFILE CARD
                           Container(
@@ -204,16 +201,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
   Widget personalItem(BuildContext context, IconData icon,
-      String title, String value, bool isTablet) {
-    return CommonWidget.personalDetailContainer(
+      String title, String value, bool isTablet) {return CommonWidget.personalDetailContainer(
       context: context,
       height: isTablet ? 90 : 75,
       width: double.infinity,
       icon: icon,
       titleText: title,
       subTitleText: value,
-    );
-  }
+    );}
   Widget logoutButton(BuildContext context, bool isTablet) {
     return GestureDetector(
       onTap: () async {

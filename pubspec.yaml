@@ -47,6 +47,12 @@ dependencies:
   http: ^1.6.0
   dio: ^5.9.2
   shared_preferences: ^2.5.4
+  pdf:
+  printing:
+  excel:
+  path_provider:
+  permission_handler:
+  file_saver:
 
 
 dev_dependencies:

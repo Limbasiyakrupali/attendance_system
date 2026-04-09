@@ -111,7 +111,7 @@ class AttendanceProvider extends ChangeNotifier{
       // log("attendanceListtattendanceListt:$attendanceListt");
 
     } catch (e) {
-      // debugPrint("Attendance Error: $e");
+      debugPrint("Attendance Error: $e");
     }
 
     isLoading = false;
@@ -174,25 +174,7 @@ class AttendanceProvider extends ChangeNotifier{
       return false;
     }
   }
-  // String getStatus(String? checkIn1) {
-  //   if (checkIn1 == null || checkIn1.isEmpty) return "Absent";
-  //
-  //   try {
-  //     final time = DateTime.parse(checkIn1).toLocal();
-  //
-  //     final lateTime = DateTime(
-  //       time.year,
-  //       time.month,
-  //       time.day,
-  //       9,
-  //       15,
-  //     );
-  //
-  //     return time.isAfter(lateTime) ? "Late" : "Present";
-  //   } catch (e) {
-  //     return "Absent";
-  //   }
-  // }
+
   String getStatus(String? checkIn1) {
     if (checkIn1 == null || checkIn1.isEmpty) return "Absent";
 

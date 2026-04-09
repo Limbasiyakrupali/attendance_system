@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:attendance_system/core/constant/app_color.dart';
 import 'package:attendance_system/core/constant/app_string.dart';
 import 'package:attendance_system/core/constant/app_typography.dart';
@@ -8,12 +5,10 @@ import 'package:attendance_system/core/widget/custom_button.dart';
 import 'package:attendance_system/services/api/api.dart';
 import 'package:attendance_system/services/api_service/api_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../core/responsive/breakpoints.dart';
 import '../core/responsive/responsive_extension.dart';
 import '../core/widget/custom_textfield.dart';
-import '../provider/attendance_provider.dart';
 import '../provider/user_provider.dart';
 import '../services/api_service/token_service.dart';
 
