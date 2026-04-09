@@ -470,9 +470,6 @@
 //   }
 //
 // }
-
-import 'dart:developer';
-
 import 'package:attendance_system/model/attendance_model.dart';
 import 'package:attendance_system/model/work_session_model.dart';
 import 'package:attendance_system/services/api/api.dart';
@@ -487,7 +484,8 @@ enum AttendanceStatus{
   completed,
 }
 
-enum AttendanceBtnStatus{
+enum AttendanceBtnStatus {
+  notCheckedIn,
   firstCheckIn,
   firstCheckOut,
   secondCheckIn,
@@ -520,10 +518,28 @@ class WorkProvider extends ChangeNotifier{
     }
 }
 
-AttendanceBtnStatus btnStatus = AttendanceBtnStatus.firstCheckIn;
+AttendanceBtnStatus btnStatus = AttendanceBtnStatus.notCheckedIn;
 
-String get attendanceStatus{
-    switch(btnStatus){
+// String get attendanceStatus{
+//     switch(btnStatus){
+//       case AttendanceBtnStatus.firstCheckIn:
+//         return "CHECKED IN (FIRST HALF)";
+//
+//       case AttendanceBtnStatus.firstCheckOut:
+//         return "CHECKED OUT (FIRST HALF)";
+//
+//       case AttendanceBtnStatus.secondCheckIn:
+//         return "CHECKED IN (SECOND HALF)";
+//
+//       case AttendanceBtnStatus.secondCheckOut:
+//         return "DAY COMPLETED";
+//     }
+// }
+  String get attendanceStatus {
+    switch (btnStatus) {
+      case AttendanceBtnStatus.notCheckedIn:
+        return "NOT CHECKED IN";
+
       case AttendanceBtnStatus.firstCheckIn:
         return "CHECKED IN (FIRST HALF)";
 
@@ -536,7 +552,7 @@ String get attendanceStatus{
       case AttendanceBtnStatus.secondCheckOut:
         return "DAY COMPLETED";
     }
-}
+  }
 
   DateTime? firstCheckIn;
   DateTime? firstCheckOut;
@@ -544,10 +560,10 @@ String get attendanceStatus{
   DateTime? secondCheckOut;
 
 
-  Future<void> loadTodayAttendance()async{
+    Future<void> loadTodayAttendance()async{
   final response = await ApiHelper.apiHelper.get(Api.todayAttendance);
 
-  log(response.toString(),name: "=============TODAY'S ATTENDANCE RESPONSE==========");
+  // log(response.toString(),name: "=============TODAY'S ATTENDANCE RESPONSE==========");
 
   AttendanceModel attendanceModel = AttendanceModel.fromJson(response);
 
@@ -562,44 +578,52 @@ String get attendanceStatus{
 
   }
 
-  // Future<void> updateStatus()async{
-  //   if(firstCheckIn == null){
+  // Future<void> updateStatus() async {
+  //
+  //   if (firstCheckIn == null) {
   //     status = AttendanceStatus.firstCheckIn;
+  //
+  //   } else if (firstCheckOut == null) {
+  //     status = AttendanceStatus.firstCheckOut;
   //     btnStatus = AttendanceBtnStatus.firstCheckIn;
   //
-  //   } else if(firstCheckOut == null){
-  //     status = AttendanceStatus.firstCheckOut;
+  //   } else if (secondCheckIn == null) {
+  //     status = AttendanceStatus.secondCheckIn;
   //     btnStatus = AttendanceBtnStatus.firstCheckOut;
   //
-  //   } else if(secondCheckIn == null){
-  //     status = AttendanceStatus.secondCheckIn;
+  //   } else if (secondCheckOut == null) {
+  //     status = AttendanceStatus.secondCheckOut;
   //     btnStatus = AttendanceBtnStatus.secondCheckIn;
   //
-  //   } else if(secondCheckOut == null){
-  //     status = AttendanceStatus.secondCheckOut;
-  //     btnStatus = AttendanceBtnStatus.firstCheckOut;
-  //   }else{
+  //   } else {
   //     status = AttendanceStatus.completed;
+  //     btnStatus = AttendanceBtnStatus.secondCheckOut;
   //   }
   // }
   Future<void> updateStatus() async {
 
+    /// NEW CONDITION
     if (firstCheckIn == null) {
       status = AttendanceStatus.firstCheckIn;
+      btnStatus = AttendanceBtnStatus.notCheckedIn;
+    }
 
-    } else if (firstCheckOut == null) {
+    else if (firstCheckOut == null) {
       status = AttendanceStatus.firstCheckOut;
       btnStatus = AttendanceBtnStatus.firstCheckIn;
+    }
 
-    } else if (secondCheckIn == null) {
+    else if (secondCheckIn == null) {
       status = AttendanceStatus.secondCheckIn;
       btnStatus = AttendanceBtnStatus.firstCheckOut;
+    }
 
-    } else if (secondCheckOut == null) {
+    else if (secondCheckOut == null) {
       status = AttendanceStatus.secondCheckOut;
       btnStatus = AttendanceBtnStatus.secondCheckIn;
+    }
 
-    } else {
+    else {
       status = AttendanceStatus.completed;
       btnStatus = AttendanceBtnStatus.secondCheckOut;
     }
@@ -631,24 +655,6 @@ String get attendanceStatus{
    } catch(e){
      throw Exception("ATTENDANCE ERROR: $e");
    }
-  }
-
-//   /// TOTAL HOURS
-  Duration get totalDuration {
-    return _sessions.fold(
-        Duration.zero, (previousValue, element) => previousValue + element.duration);
-  }
-
-  /// DAYS WORKED
-  int get daysWorked => _sessions.length;
-
-  /// AVG DAILY HOURS
-  Duration get avgDaily {
-
-    if (_sessions.isEmpty) return Duration.zero;
-
-    return Duration(
-        minutes: totalDuration.inMinutes ~/ _sessions.length);
   }
 
 }

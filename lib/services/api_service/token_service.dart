@@ -7,10 +7,14 @@ class TokenService {
     await preferences.setString('token', token);
    await preferences.setString('role', role);
    await preferences.setString('id', userId);
+    await preferences.reload(); // 🔥 important for consistency
+
+    print("TOKEN SAVED: $token");
   }
 
   static Future<String?> getToken()async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.reload();
     return preferences.getString('token');
   }
 

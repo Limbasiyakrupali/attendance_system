@@ -37,6 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
     Future.microtask(() {
       Provider.of<WorkProvider>(context, listen: false)
           .loadTodayAttendance();
+    context.read<AttendanceProvider>().fetchAttendance();
+
       // Provider.of<AttendanceProvider>(context,listen: false).filterAttendance();
     });
   }
@@ -123,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             BottomNavigationBarItem(
               label: "Home",
-              icon: buildIcon(FeatherIcons.home,0),
+              icon: buildIcon(FeatherIcons.grid,0),
             ),
 
             BottomNavigationBarItem(
@@ -143,8 +145,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
             if(role == "ADMIN" || role == 'HR')
               BottomNavigationBarItem(
-                label: "User",
-                icon: buildIcon(FeatherIcons.userPlus,4),
+                label: "Users",
+                icon: buildIcon(FeatherIcons.users,4),
               ),
           ],
         ),

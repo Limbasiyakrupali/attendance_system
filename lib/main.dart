@@ -1,4 +1,5 @@
 import 'package:attendance_system/provider/attendance_provider.dart';
+import 'package:attendance_system/provider/dashboard_provider.dart';
 import 'package:attendance_system/provider/user_provider.dart';
 import 'package:attendance_system/provider/work_provider.dart';
 import 'package:attendance_system/screen/add_user_screen.dart';
@@ -10,6 +11,7 @@ import 'package:attendance_system/screen/home_screen.dart';
 import 'package:attendance_system/screen/profile_screen.dart';
 import 'package:attendance_system/screen/show_user_list_screen.dart';
 import 'package:attendance_system/screen/status_screen.dart';
+import 'package:attendance_system/screen/total_users_detail_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +24,7 @@ void main() async {
       ChangeNotifierProvider(create: (_)=> WorkProvider()),
       ChangeNotifierProvider(create: (_)=> AttendanceProvider()),
       ChangeNotifierProvider(create: (_)=> UserProvider()),
+      ChangeNotifierProvider(create: (_)=> DashboardProvider()),
     ],
       child: const MyApp())
   );
@@ -44,6 +47,7 @@ class MyApp extends StatelessWidget {
         "history": (context) =>  HistoryScreen(),
         "add_user": (context) => const AddUserScreen(),
         "show_user": (context) => const ShowUserListScreen(),
+        "total_users": (context) => const TotalUsersDetailScreens(),
       },
     );
   }

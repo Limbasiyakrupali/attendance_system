@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:attendance_system/core/constant/app_color.dart';
 import 'package:flutter/material.dart';
 import '../core/constant/app_string.dart';
@@ -8,6 +10,7 @@ import '../core/widget/custom_button.dart';
 import '../core/widget/custom_textfield.dart';
 import '../services/api/api.dart';
 import '../services/api_service/api_helper.dart';
+import '../services/api_service/token_service.dart';
 
 class ChangePassword extends StatefulWidget {
   const ChangePassword({super.key});
@@ -140,6 +143,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                         /// UPDATE PASSWORD BUTTON
                         CustomButton(
                           text: AppString.updatePasswordText,
+                          width: MediaQuery.of(context).size.width,
                           onPressed: () async {
                               try {
                                 var response = await ApiHelper.apiHelper.put(
@@ -149,6 +153,8 @@ class _ChangePasswordState extends State<ChangePassword> {
                                     "newPassword": newPasswordController.text,
                                   },
                                 );
+                                // log(response.toString(),name: "password responseeee");
+                                await TokenService.getToken();
                                 if (response['success'] == true) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(content: Text("Password changed successfully"), backgroundColor: Colors.green, behavior: SnackBarBehavior.floating,),);

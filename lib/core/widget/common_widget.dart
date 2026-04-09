@@ -46,13 +46,13 @@ class CommonWidget {
 
   static Widget personalDetailContainer({required BuildContext context,required double height, required double width, required String titleText, required String subTitleText,required IconData icon}){
    return Container(
-     margin: EdgeInsets.only(left: 5,right: 10,top: 14),
+     margin: EdgeInsets.only(left: 8,right: 8,top: 14),
      height: height,
      width: width,
      decoration: BoxDecoration(
-         color: AppColors.primary.withOpacity(0.1),
+         color: Colors.grey.shade100,
          borderRadius: BorderRadius.all(Radius.circular(8)),
-         border: Border.all(color: AppColors.primary)
+         border: Border.all(color:Colors.grey.shade300)
      ),
      child: Row(
        children: [
@@ -71,7 +71,7 @@ class CommonWidget {
            crossAxisAlignment: CrossAxisAlignment.start,
            mainAxisAlignment: MainAxisAlignment.center,
            children: [
-             Text(titleText,style: AppTypography.getTextTheme(context).titleSmall?.copyWith(color: AppColors.primary,fontSize: 15),),
+             Text(titleText,style: AppTypography.getTextTheme(context).titleSmall?.copyWith(color: AppColors.black,fontSize: 15),),
              SizedBox(height: 3),
              Text(subTitleText,style: AppTypography.getTextTheme(context).bodyLarge?.copyWith(color: AppColors.grey,fontSize: 14.5,)),
            ],
@@ -81,9 +81,9 @@ class CommonWidget {
    );
   }
 
-  static Widget commonStatusButton({required BuildContext context, required double height, required double width, required Color color, IconData? icon, required Color iconColor, required Color borderColor, required String buttonTitle, required Color stringTextColor, double? iconSize}){
+  static Widget commonStatusButton({required BuildContext context, required double height,EdgeInsetsGeometry? margin, required double width, required Color color, IconData? icon, required Color iconColor, required Color borderColor, required String buttonTitle, required Color stringTextColor, double? iconSize}){
    return  Container(
-     margin: EdgeInsets.only(right: 10, bottom: 12,left: 5),
+     margin: margin,
      height: height,
      width: width,
      decoration: BoxDecoration(
@@ -96,7 +96,7 @@ class CommonWidget {
        children: [
          Icon(icon,color: iconColor,size: iconSize,),
          SizedBox(width: 5,),
-         Text(buttonTitle,style: AppTypography.getTextTheme(context).titleSmall?.copyWith(color: stringTextColor),),
+         Text(buttonTitle,style: AppTypography.getTextTheme(context).titleSmall?.copyWith(color: stringTextColor,fontSize: 16),),
        ],
      ),
    );
@@ -249,5 +249,57 @@ static Future<dynamic> commonAlertDialogBox({
      },
    );
 }
+}
 
+class BlinkingDot extends StatefulWidget {
+  final Color color;
+  final double size;
+
+  const BlinkingDot({
+    super.key,
+    this.color = Colors.blue,
+    this.size = 10,
+  });
+
+  @override
+  State<BlinkingDot> createState() => _BlinkingDotState();
+}
+
+class _BlinkingDotState extends State<BlinkingDot>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _opacity;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 800),
+    )..repeat(reverse: true);
+
+    _opacity = Tween<double>(begin: 0.2, end: 1.0).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _opacity,
+      child: Container(
+        width: widget.size,
+        height: widget.size,
+        decoration: BoxDecoration(
+          color: widget.color,
+          shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
 }

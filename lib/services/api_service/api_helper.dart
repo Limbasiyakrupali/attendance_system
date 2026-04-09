@@ -13,6 +13,7 @@ class ApiHelper {
   Future<Map<String,String>> headers()async{
 
     String? token = await TokenService.getToken();
+    print("TOKEN =====> $token");
 
     return {
       "Content-Type": "application/json",
@@ -67,6 +68,20 @@ class ApiHelper {
     }
   }
 
+  /// ================= PATCH =================
+  Future<dynamic> patch(String url, Map<String, dynamic> body) async {
+    try {
+      final response = await http.patch(
+        Uri.parse(url),
+        headers: await headers(), // must include auth token
+        body: jsonEncode(body),
+      ).timeout(const Duration(seconds: 30));
+
+      return handleResponse(response);
+    } catch (e) {
+      throw "ERROR: $e";
+    }
+  }
 
   /// ================= DELETE =================
    Future<dynamic> delete(String url)async{

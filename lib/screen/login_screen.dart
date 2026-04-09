@@ -9,9 +9,12 @@ import 'package:attendance_system/services/api/api.dart';
 import 'package:attendance_system/services/api_service/api_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../core/responsive/breakpoints.dart';
 import '../core/responsive/responsive_extension.dart';
 import '../core/widget/custom_textfield.dart';
+import '../provider/attendance_provider.dart';
+import '../provider/user_provider.dart';
 import '../services/api_service/token_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -27,7 +30,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool showPassword = true;
   bool checkBoxValue = false;
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -156,6 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         /// BUTTON
                         CustomButton(
                           text: "LOGIN",
+                            width: double.infinity,
                             onPressed: () async {
                               try {
                                 var response = await ApiHelper.apiHelper.post(
@@ -171,9 +174,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   String userId = response['user']['id'];
 
                                   await TokenService.saveToken(token, role,userId);
-                                  log(response.toString(), name: "==========Login Api Response==========");
-                                  log(role, name: "==========User Role==========");
-                                  print("Iddddddddddd-----------${response['user']['id']}");
+                                  context.read<UserProvider>().setUserData(response);
+                                  // log(response.toString(), name: "==========Login Api Response==========");
+                                  // log(role, name: "==========User Role==========");
+                                  // print("Iddddddddddd-----------${response['user']['id']}");
                                   Navigator.pushReplacementNamed(
                                     context,
                                     '/home',

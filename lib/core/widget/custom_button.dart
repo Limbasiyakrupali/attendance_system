@@ -9,6 +9,7 @@ class CustomButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool isLoading;
   final ButtonType type;
+  final double? width;
 
   const CustomButton({
     super.key,
@@ -16,6 +17,7 @@ class CustomButton extends StatelessWidget {
     this.onPressed,
     this.isLoading = false,
     this.type = ButtonType.primary,
+    this.width,
   });
 
   Color _getColor() {
@@ -36,7 +38,7 @@ class CustomButton extends StatelessWidget {
     final color = _getColor();
 
     return SizedBox(
-      width: double.infinity,
+      width: width,
       height: 50,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
@@ -112,8 +114,8 @@ Widget dashboardCardContent({
               .bodyLarge
               ?.copyWith(
             color: AppColors.grey,
-            fontWeight: FontWeight.w800,
-            fontSize: 17
+            fontWeight: FontWeight.w600,
+            fontSize: 18
           ),
         ),
         Spacer(),
@@ -328,24 +330,24 @@ Widget attendanceCardContent(BuildContext context,String checkInTime, String che
             children: [
               Row(
                 children: [
-                  Icon(Icons.login, color: AppColors.primary, size: 25,),
+                  Icon(Icons.login, color: AppColors.grey, size: 25,),
                   SizedBox(width: 8),
                   Text(
-                    "Check In", style:AppTypography.getTextTheme(context).titleSmall?.copyWith(fontSize: 16, fontWeight: FontWeight.w600,color: AppColors.primary),
+                    "Check In", style:AppTypography.getTextTheme(context).titleSmall?.copyWith(fontSize: 16, fontWeight: FontWeight.w600,color: AppColors.grey),
                   ),
                 ],
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 10),
               Row(
                 children: [
                   Padding(
                     padding: EdgeInsets.only(left: 5),
-                    child: Icon(Icons.access_time, size: 21.5, color: AppColors.grey),
+                    child: Icon(Icons.access_time, size: 21.5, color: AppColors.black),
                   ),
                   SizedBox(width: 6),
                   Text(
                     checkInTime,
-                      style: AppTypography.getTextTheme(context).bodyLarge?.copyWith(fontSize: 17, fontWeight: FontWeight.w500,color: AppColors.grey)
+                      style: AppTypography.getTextTheme(context).bodyLarge?.copyWith(fontSize: 17, fontWeight: FontWeight.w500,color: AppColors.black)
                   ),
                 ],
               ),
@@ -354,37 +356,43 @@ Widget attendanceCardContent(BuildContext context,String checkInTime, String che
         ),
         /// ✅ CENTER VERTICAL LINE
         Container(
-          height: 65,
+          height: 70,
           width: 2,
           color: AppColors.primary,
         ),
-        SizedBox(width: 20,),
+        SizedBox(width: 10),
         /// ✅ CHECK OUT
         Expanded(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Icon(Icons.logout, color: AppColors.primary, size: 23,),
-                  SizedBox(width: 6),
-                  Text(
-                    "Check Out",
-                      style:AppTypography.getTextTheme(context).titleSmall?.copyWith(fontSize: 16, fontWeight: FontWeight.w600,color: AppColors.primary)
-                  ),
-                ],
+              Padding(
+                padding: EdgeInsets.only(left: 12),
+                child: Row(
+                  children: [
+                    Icon(Icons.logout, color: AppColors.grey, size: 23,),
+                    SizedBox(width: 6),
+                    Text(
+                      "Check Out",
+                        style:AppTypography.getTextTheme(context).titleSmall?.copyWith(fontSize: 16, fontWeight: FontWeight.w600,color: AppColors.grey)
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(Icons.access_time, size: 21.5, color: AppColors.grey),
-                  SizedBox(width: 6),
-                  Text(
-                    checkOutTime,
-                      style: AppTypography.getTextTheme(context).bodyLarge?.copyWith(fontSize: 17, fontWeight: FontWeight.w500,color: AppColors.grey)
-                  ),
-                ],
+              SizedBox(height: 10),
+              Padding(
+                padding: EdgeInsets.only(left: 12),
+                child: Row(
+                  children: [
+                    Icon(Icons.access_time, size: 21.5, color: AppColors.black),
+                    SizedBox(width: 6),
+                    Text(
+                      checkOutTime,
+                        style: AppTypography.getTextTheme(context).bodyLarge?.copyWith(fontSize: 17, fontWeight: FontWeight.w500,color: AppColors.black)
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -404,7 +412,7 @@ Widget attendanceHistoryCheckInCardContent({required BuildContext context,requir
           width: MediaQuery.of(context).size.width/2,
           decoration: BoxDecoration(
               color: AppColors.white,
-              border: Border.all(color: AppColors.primary),
+              // border: Border.all(color: AppColors.primary),
               borderRadius: BorderRadius.all(Radius.circular(5))
           ),
           child: Padding(
@@ -415,10 +423,10 @@ Widget attendanceHistoryCheckInCardContent({required BuildContext context,requir
               children: [
                 Row(
                   children: [
-                    Icon(Icons.login, color: AppColors.primary, size: 22,),
+                    Icon(Icons.login, color: AppColors.grey, size: 22,),
                     SizedBox(width: 8),
                     Text(
-                        checkInText1, style:AppTypography.getTextTheme(context).titleSmall?.copyWith(fontSize: 16, fontWeight: FontWeight.w600,color: AppColors.primary)),
+                        checkInText1, style:AppTypography.getTextTheme(context).titleSmall?.copyWith(fontSize: 16, fontWeight: FontWeight.w600,color: AppColors.grey)),
                   ],
                 ),
                 SizedBox(height: 10),
@@ -426,12 +434,12 @@ Widget attendanceHistoryCheckInCardContent({required BuildContext context,requir
                   children: [
                     Padding(
                       padding: EdgeInsets.only(left: 5),
-                      child: Icon(Icons.access_time, size: 20.5, color: AppColors.grey),
+                      child: Icon(Icons.access_time, size: 20.5, color: AppColors.black),
                     ),
                     SizedBox(width: 6),
                     Text(
                         checkInTime1,
-                        style:AppTypography.getTextTheme(context).bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w600,color: AppColors.grey)
+                        style:AppTypography.getTextTheme(context).bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w600,color: AppColors.black)
                     ),
                   ],
                 ),
@@ -447,7 +455,7 @@ Widget attendanceHistoryCheckInCardContent({required BuildContext context,requir
           width: MediaQuery.of(context).size.width/2,
           decoration: BoxDecoration(
               color: AppColors.white,
-              border: Border.all(color: AppColors.primary),
+              // border: Border.all(color: AppColors.primary),
               borderRadius: BorderRadius.all(Radius.circular(8))
           ),
           child: Padding(
@@ -458,10 +466,10 @@ Widget attendanceHistoryCheckInCardContent({required BuildContext context,requir
               children: [
                 Row(
                   children: [
-                    Icon(Icons.login, color: AppColors.primary, size: 22,),
+                    Icon(Icons.login, color: AppColors.grey, size: 22,),
                     SizedBox(width: 8),
                     Text(
-                        checkOutText1, style:AppTypography.getTextTheme(context).titleSmall?.copyWith(fontSize: 16, fontWeight: FontWeight.w600,color: AppColors.primary)),
+                        checkOutText1, style:AppTypography.getTextTheme(context).titleSmall?.copyWith(fontSize: 16, fontWeight: FontWeight.w600,color: AppColors.grey)),
                   ],
                 ),
                 SizedBox(height: 10),
@@ -469,12 +477,12 @@ Widget attendanceHistoryCheckInCardContent({required BuildContext context,requir
                   children: [
                     Padding(
                       padding: EdgeInsets.only(left: 5),
-                      child: Icon(Icons.access_time, size: 20.5, color: AppColors.grey),
+                      child: Icon(Icons.access_time, size: 20.5, color: AppColors.black),
                     ),
                     SizedBox(width: 6),
                     Text(
                         checkInTime2,
-                        style:AppTypography.getTextTheme(context).bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w600,color: AppColors.grey)
+                        style:AppTypography.getTextTheme(context).bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w600,color: AppColors.black)
                     ),
 
                   ],

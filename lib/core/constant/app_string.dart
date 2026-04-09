@@ -15,5 +15,9 @@ class AppString {
   static const String personalInformationText = "Personal Information";
   static const String logoutText = "LOGOUT";
   static const String historyTitle = "My Attendance History";
+  static const String fullHistoryTitle = "Full Attendance History";
   static const String dashBoardTitle = "My DashBoard";
+  static const String toDaysAttendanceTitle = "Today's Attendance";
+  static const String totalEmployeeTitle = "User Detail";
+  static const String addUserTitle = "Add user";
 }
